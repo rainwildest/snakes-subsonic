@@ -27,6 +27,7 @@ public:
 protected:
     void keyPressEvent(QKeyEvent *event);
     void paintEvent(QPaintEvent *event);
+    void deleteLast();
 
     void addTop();
     void addDown();

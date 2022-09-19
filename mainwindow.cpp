@@ -74,16 +74,23 @@ void MainWindow::timeout()
 {
     switch(moveFlag) {
         case DIR_UP:
+            addTop();
             break;
         case DIR_DOWN:
+            addDown();
             break;
         case DIR_LEFT:
+            addLeft();
             break;
         case DIR_RIGHT:
+            addRight();
             break;
         default:
             break;
     }
+
+    deleteLast();
+    update();
 }
 
 void MainWindow::addTop()
@@ -95,10 +102,56 @@ void MainWindow::addTop()
         leftTop = QPointF(snake[0].x(), this->height() - nodeHeight);
         rightBottom = QPointF(snake[0].x() + nodeWidth, this->height());
     } else {
-        qDebug() << snake[0].y() - nodeHeight;
         leftTop = QPointF(snake[0].x(), snake[0].y() - nodeHeight);
         rightBottom = snake[0].topRight();
     }
+
+    snake.insert(0, QRectF(leftTop, rightBottom));
+}
+
+void MainWindow::addDown()
+{
+    QPointF leftTop;
+    QPointF rightBottom;
+
+    if(snake[0].y() + nodeHeight * 2 > this->height()) {
+        leftTop = QPointF(snake[0].x(), 0);
+        rightBottom = QPointF(snake[0].x() + nodeWidth, nodeHeight);
+    } else {
+        leftTop = snake[0].bottomLeft();
+        rightBottom = snake[0].bottomRight() + QPointF(0, nodeHeight);
+    }
+
+    snake.insert(0, QRectF(leftTop, rightBottom));
+}
+
+void MainWindow::addRight()
+{
+    QPointF leftTop;
+    QPointF rightBottom;
+
+    if(snake[0].x() + nodeWidth * 2 > this->width()) {
+        leftTop = QPointF(0, snake[0].y());
+    } else {
+        leftTop = QPointF(snake[0].x() + nodeWidth, snake[0].y());
+    }
+    rightBottom = leftTop + QPointF(nodeWidth, nodeHeight);
+
+    snake.insert(0, QRectF(leftTop, rightBottom));
+}
+
+void MainWindow::addLeft()
+{
+    QPointF leftTop;
+    QPointF rightBottom;
+
+    if(snake[0].x() - nodeWidth < 0) {
+        leftTop = QPointF(this->width() - nodeWidth, snake[0].y());
+    } else {
+        leftTop = snake[0].topLeft() - QPointF(nodeWidth, 0);
+    }
+
+    rightBottom = leftTop + QPointF(nodeWidth, nodeHeight);
 
     snake.insert(0, QRectF(leftTop, rightBottom));
 }
@@ -119,5 +172,12 @@ void MainWindow::paintEvent(QPaintEvent *event)
 
     for(int i = 0; i < snake.length(); ++i) {
         painter.drawRect(snake[i]);
+    }
+}
+
+void MainWindow::deleteLast()
+{
+    if(snake.length() != 0) {
+        snake.removeLast();
     }
 }
