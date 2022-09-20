@@ -34,6 +34,7 @@ protected:
     void addRight();
     void addLeft();
 
+    void addNewReword();
 private:
     Ui::MainWindow *ui;
 
@@ -46,6 +47,9 @@ private:
     int time = 100;
     // 蛇
     QList <QRectF> snake;
+
+    // 奖品
+    QRectF rewardNode;
 
     // 小方块的宽高
     int nodeWidth = 20;

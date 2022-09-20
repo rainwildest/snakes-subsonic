@@ -3,6 +3,7 @@
 #include <QPen>
 #include <QBrush>
 #include <QPainter>
+#include <QRandomGenerator>
 #include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -16,10 +17,14 @@ MainWindow::MainWindow(QWidget *parent)
 
     resize(600, 368);
 
+    // 初始化蛇身
     QRectF rect(300, 180, nodeWidth, nodeHeight);
     snake.append(rect);
     addTop();
     addTop();
+
+    // 初始化奖品
+    addNewReword();
 }
 
 MainWindow::~MainWindow()
@@ -72,21 +77,30 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 
 void MainWindow::timeout()
 {
-    switch(moveFlag) {
-        case DIR_UP:
-            addTop();
-            break;
-        case DIR_DOWN:
-            addDown();
-            break;
-        case DIR_LEFT:
-            addLeft();
-            break;
-        case DIR_RIGHT:
-            addRight();
-            break;
-        default:
-            break;
+    int count = 1;
+    // 判断是否重合
+    if(snake[0].intersects(rewardNode)) {
+        count++;
+        addNewReword();
+    }
+
+    while (count--) {
+        switch(moveFlag) {
+            case DIR_UP:
+                addTop();
+                break;
+            case DIR_DOWN:
+                addDown();
+                break;
+            case DIR_LEFT:
+                addLeft();
+                break;
+            case DIR_RIGHT:
+                addRight();
+                break;
+            default:
+                break;
+        }
     }
 
     deleteLast();
@@ -173,6 +187,15 @@ void MainWindow::paintEvent(QPaintEvent *event)
     for(int i = 0; i < snake.length(); ++i) {
         painter.drawRect(snake[i]);
     }
+
+    // 画奖品
+    pen.setColor(Qt::red);
+    brush.setColor(Qt::red);
+    brush.setStyle(Qt::SolidPattern);
+    painter.setPen(pen);
+    painter.setBrush(brush);
+    painter.drawEllipse(rewardNode);
+//    painter.drawRect(rewardNode);
 }
 
 void MainWindow::deleteLast()
@@ -180,4 +203,18 @@ void MainWindow::deleteLast()
     if(snake.length() != 0) {
         snake.removeLast();
     }
+}
+
+void MainWindow::addNewReword()
+{
+    int x = QRandomGenerator::global()->bounded((this->width() / 20));
+    int y= QRandomGenerator::global()->bounded((this->height() / 20));
+
+//    QRandomGenerator *randInt = new QRandomGenerator();
+//    int x =  randInt->bounded((this->width() / 20));
+//    int y = randInt->bounded((this->height() / 20));
+    qDebug() << "x: " << x << " y: " << y;
+//     qrand() % (this->width()/20) * 20
+//     qrand() % (this->height() / 20)
+    rewardNode = QRectF(x * 20, y * 20, nodeWidth, nodeHeight);
 }
