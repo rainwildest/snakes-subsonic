@@ -4,6 +4,7 @@
 #include <QBrush>
 #include <QPainter>
 #include <QRandomGenerator>
+#include <QFont>
 #include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -15,7 +16,7 @@ MainWindow::MainWindow(QWidget *parent)
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &MainWindow::timeout);
 
-    resize(600, 368);
+    resize(600, 360);
 
     // 初始化蛇身
     QRectF rect(300, 180, nodeWidth, nodeHeight);
@@ -196,6 +197,18 @@ void MainWindow::paintEvent(QPaintEvent *event)
     painter.setBrush(brush);
     painter.drawEllipse(rewardNode);
 //    painter.drawRect(rewardNode);
+
+    if(checkContact()) {
+        QFont font;
+        font.setPixelSize(30);
+        font.setWeight(QFont::Bold);
+        painter.setFont(font);
+        painter.drawText((this->width() - 160) / 2, (this->height() - 30) / 2, QString("Game Over!") );
+
+        timer->stop();
+    }
+
+//    MainWindow::paintEvent(event);
 }
 
 void MainWindow::deleteLast()
@@ -208,13 +221,21 @@ void MainWindow::deleteLast()
 void MainWindow::addNewReword()
 {
     int x = QRandomGenerator::global()->bounded((this->width() / 20));
-    int y= QRandomGenerator::global()->bounded((this->height() / 20));
+    int y = QRandomGenerator::global()->bounded((this->height() / 20));
 
-//    QRandomGenerator *randInt = new QRandomGenerator();
-//    int x =  randInt->bounded((this->width() / 20));
-//    int y = randInt->bounded((this->height() / 20));
     qDebug() << "x: " << x << " y: " << y;
-//     qrand() % (this->width()/20) * 20
-//     qrand() % (this->height() / 20)
     rewardNode = QRectF(x * 20, y * 20, nodeWidth, nodeHeight);
+}
+
+bool MainWindow::checkContact()
+{
+    for(int i = 0 ; i < snake.length(); i++) {
+        for(int j = i + 1; j < snake.length(); j++) {
+            if(snake[i] == snake[j]) {
+                return true;
+            }
+        }
+    }
+
+    return false;
 }

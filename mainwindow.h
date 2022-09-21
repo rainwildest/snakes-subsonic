@@ -35,6 +35,8 @@ protected:
     void addLeft();
 
     void addNewReword();
+    bool checkContact();
+
 private:
     Ui::MainWindow *ui;
 
